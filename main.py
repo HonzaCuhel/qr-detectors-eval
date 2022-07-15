@@ -15,9 +15,9 @@ class TextHelper:
     def putText(self, frame, text, coords):
         cv2.putText(frame, text, coords, self.text_type, 0.8, self.bg_color, 3, self.line_type)
         cv2.putText(frame, text, coords, self.text_type, 0.8, self.color, 1, self.line_type)
-    def rectangle(self, frame, p1, p2):
+    def rectangle(self, frame, p1, p2, color=None):
         cv2.rectangle(frame, p1, p2, self.bg_color, 6)
-        cv2.rectangle(frame, p1, p2, self.color, 1)
+        cv2.rectangle(frame, p1, p2, self.color if color is None else color, 1)
 
 
 class Mode(Enum):
@@ -29,7 +29,10 @@ class Mode(Enum):
 
 def opencv_qr_detection(frame, opencv_detector, c):
     text, bbox, _ = opencv_detector.detectAndDecode(frame)
-    if text != '' and bbox is not None:
+    if text == '' and bbox is not None:
+        bbox = bbox.astype(int)
+        c.rectangle(frame, bbox[0][0], bbox[0][2], color=(0, 0, 255))
+    elif text != '' and bbox is not None:
         bbox = bbox.astype(int)
         c.rectangle(frame, bbox[0][0], bbox[0][2])
         c.putText(frame, text, (bbox[0][0][0] + 10, bbox[0][0][1] + 40))
@@ -40,13 +43,16 @@ def opencv_qr_detection(frame, opencv_detector, c):
 
 def wechat_qr_detection(frame, wechat_detector, c):
     text, bbox = wechat_detector.detectAndDecode(frame)
-    if text != () and bbox != ():
+    if text == () and bbox != ():
+        bbox = [bbox[0].astype(int)]
+        c.rectangle(frame, bbox[0][0], bbox[0][2], color=(0, 0, 255))
+    elif text != () and bbox != ():
         bbox = [bbox[0].astype(int)]
         c.rectangle(frame, bbox[0][0], bbox[0][2])
         c.putText(frame, text[0], (bbox[0][0][0] + 10, bbox[0][0][1] + 40))
-        # data = zbarlight.scan_codes(['qrcode'], img)
     else:
-        print("WeChatQRCode wasn't able to detect any QR codes!")
+        # print("WeChatQRCode wasn't able to detect any QR codes!")
+        pass
 
 
 def pyzbar_qr_detection(frame, c):
@@ -54,8 +60,11 @@ def pyzbar_qr_detection(frame, c):
     if len(qr_decoded) > 0:
         # print(qr_decoded[0].data, qr_decoded[0].polygon)
         bbox = [(int(point.x), int(point.y)) for point in qr_decoded[0].polygon]
-        c.rectangle(frame, bbox[0], bbox[2])
-        c.putText(frame, str(qr_decoded[0].data), (bbox[0][0] + 5, bbox[0][1] + 20))
+        if str(qr_decoded[0].data) == '':
+            c.rectangle(frame, bbox[0], bbox[2], color=(0, 0, 255))
+        else:
+            c.rectangle(frame, bbox[0], bbox[2])
+            c.putText(frame, str(qr_decoded[0].data), (bbox[0][0] + 5, bbox[0][1] + 20))
     else:
         print("pyzbar wasn't able to detect any QR codes!")
 
