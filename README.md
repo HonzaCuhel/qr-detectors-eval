@@ -36,3 +36,19 @@ python3 main.py --wechat
 # Default run with WeChat QR code detector/decoder and video file
 python3 main.py --wechat qr_code.avi
 ```
+
+## Materials
+
+### OpenCV
+
+- https://docs.opencv.org/4.x/de/dc3/classcv_1_1QRCodeDetector.html
+- https://learnopencv.com/opencv-qr-code-scanner-c-and-python/ 
+
+### WeChat
+
+- https://docs.opencv.org/4.x/d5/d04/classcv_1_1wechat__qrcode_1_1WeChatQRCode.html
+- https://learnopencv.com/wechat-qr-code-scanner-in-opencv/
+
+### pyzbar
+
+- https://pypi.org/project/pyzbar/
